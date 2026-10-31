@@ -15,7 +15,6 @@ export async function POST(request) {
             return NextResponse.json({ success: false, error: "Credenciales inválidas" }, { status: 401 });
         }
 
-        // Aquí puedes responder con la sesión o cookie de sesión HTTP-only
         const response = NextResponse.json({
             success: true,
             user: {
@@ -26,7 +25,6 @@ export async function POST(request) {
             }
         });
 
-        // Ejemplo simple con cookie de sesión
         response.cookies.set("user_session", JSON.stringify({ id: user.id, roleId: user.role_id }), {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",

@@ -1,7 +1,7 @@
     import { NextResponse } from "next/server";
     import db from "@/lib/db";
     import { getExternalData } from "@/lib/fakeapi";
-    import { sync_queries } from "@/lib/sync_queries"
+    import { queries } from "@/lib/queries"
     import { hasPermission } from "@/lib/auth";
 
 
@@ -49,7 +49,7 @@
 
             for (let i = 0; i < users.length; i += 500) {
                 const batch = users.slice(i, i + 500);
-                await sync_queries.upsertUsersBatch(client, batch);
+                await queries.upsertUsersBatch(client, batch);
             }
             console.log('✅ Usuarios sincronizados masivamente.');
 
@@ -58,7 +58,7 @@
 
             for (let i = 0; i < validOrders.length; i += 500) {
                 const batch = validOrders.slice(i, i + 500);
-                await sync_queries.upsertOrdersBatch(client, batch);
+                await queries.upsertOrdersBatch(client, batch);
             }
             console.log('✅ Órdenes sincronizadas masivamente.');
 
@@ -74,7 +74,7 @@
             
             for (let i = 0; i < validPayments.length; i += 500) {
                 const batch = validPayments.slice(i, i + 500);
-                await sync_queries.upsertPaymentsBatch(client, batch);
+                await queries.upsertPaymentsBatch(client, batch);
             }
 
             const pointMovements = [];
@@ -97,17 +97,17 @@
             if (pointMovements.length > 0) {
                 for (let i = 0; i < pointMovements.length; i += 500) {
                     const batch = pointMovements.slice(i, i + 500);
-                    await sync_queries.insertPointMovementsBatch(client, batch);
+                    await queries.insertPointMovementsBatch(client, batch);
                 }
             }
             console.log('✅ Pagos y movimientos de puntos sincronizados.');
 
-            const deliveredOrders = await sync_queries.getDeliveredOrders(client, CUTOFF_DATE);
+            const deliveredOrders = await queries.getDeliveredOrders(client, CUTOFF_DATE);
             const bonusMovements = [];
 
             for (const order of deliveredOrders.rows){
                 const ref = `orden: ${order.id}`;
-                const existing = await sync_queries.checkBonusExists(client, ref);
+                const existing = await queries.checkBonusExists(client, ref);
                 if (existing.rowCount === 0){
                     const fecha = new Date(order.created_at).toISOString().split('T')[0];
                     bonusMovements.push([order.user_id, fecha, 'bono_orden_entregada', ref, 250]);
@@ -117,12 +117,12 @@
             if (bonusMovements.length > 0) {
                 for (let i = 0; i < bonusMovements.length; i += 500) {
                     const batch = bonusMovements.slice(i, i + 500);
-                    await sync_queries.insertPointMovementsBatch(client, batch);
+                    await queries.insertPointMovementsBatch(client, batch);
                 }
             }
             console.log('✅ Bonos de órdenes procesados.');
 
-            await sync_queries.updateAllUserMetrics(client, CUTOFF_DATE);
+            await queries.updateAllUserMetrics(client, CUTOFF_DATE);
             console.log('✅ Métricas y tiers actualizados en la base de datos.')
 
             await client.query('COMMIT');
