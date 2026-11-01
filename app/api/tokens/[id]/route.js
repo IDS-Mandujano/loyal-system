@@ -1,51 +1,44 @@
 import { NextResponse } from 'next/server';
-import db from '@/lib/db';
 import { cookies } from 'next/headers';
+import { verifyUserPermission } from '@/lib/services/authService';
+import { revokeApiToken } from '@/lib/services/tokenService';
 
 export async function DELETE(request, { params }) {
-  const { id } = await params;
-  const cookieStore = await cookies();
-  const sessionCookie = cookieStore.get('user_session');
-
-  if (!sessionCookie) {
-    return NextResponse.json({ success: false, error: 'No autorizado.' }, { status: 401 });
-  }
-
-  const client = await db.getClient();
   try {
-    const sessionData = JSON.parse(sessionCookie.value);
-    
-    const permissionCheck = await client.query(`
-      SELECT 1 FROM role_permissions rp
-      JOIN permissions p ON rp.permission_id = p.id
-      WHERE rp.role_id = $1 AND p.code = 'manage_users'
-    `, [sessionData.roleId]);
+    const { id } = await params;
+    const cookieStore = await cookies();
+    const sessionCookie = cookieStore.get('user_session');
 
-    if (permissionCheck.rowCount === 0) {
+    if (!sessionCookie) {
+      return NextResponse.json({ success: false, error: 'No autorizado.' }, { status: 401 });
+    }
+
+    let sessionData;
+    try {
+      sessionData = JSON.parse(sessionCookie.value);
+    } catch (e) {
+      return NextResponse.json({ success: false, error: 'Sesión inválida.' }, { status: 401 });
+    }
+
+    const hasPermission = await verifyUserPermission(sessionData.roleId, 'manage_users');
+    if (!hasPermission) {
       return NextResponse.json({ success: false, error: 'Acceso denegado.' }, { status: 403 });
     }
 
-    const result = await client.query(`
-      UPDATE api_tokens 
-      SET is_active = FALSE 
-      WHERE id = $1 
-      RETURNING id, name, is_active;
-    `, [id]);
+    const revokedToken = await revokeApiToken(id);
 
-    if (result.rowCount === 0) {
+    if (!revokedToken) {
       return NextResponse.json({ success: false, error: 'Token no encontrado.' }, { status: 404 });
     }
 
     return NextResponse.json({
       success: true,
       message: 'Token revocado correctamente.',
-      token: result.rows[0]
+      token: revokedToken
     });
 
   } catch (error) {
     console.error('Error al revocar token:', error);
     return NextResponse.json({ success: false, error: 'Error interno del servidor.' }, { status: 500 });
-  } finally {
-    client.release();
   }
 }
