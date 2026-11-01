@@ -9,6 +9,7 @@ export function useLogin() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false)
   const router = useRouter();
 
   const handleLogin = async (e) => {
@@ -35,6 +36,8 @@ export function useLogin() {
     setError,
     loading,
     setLoading,
+    showPassword,
+    setShowPassword,
     handleLogin,
   };
 }
