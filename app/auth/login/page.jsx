@@ -10,6 +10,8 @@ export default function LoginPage() {
     setPassword,
     error,
     loading,
+    showPassword,
+    setShowPassword,
     handleLogin,
   } = useLogin();
 
@@ -99,6 +101,7 @@ export default function LoginPage() {
                 border: "1px solid #cbd5e1",
                 borderRadius: "0.375rem",
                 fontSize: "0.875rem",
+                boxSizing: "border-box",
               }}
             />
           </div>
@@ -115,20 +118,42 @@ export default function LoginPage() {
             >
               Contraseña
             </label>
-            <input
-              type="password"
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
-              style={{
-                width: "100%",
-                padding: "0.625rem",
-                border: "1px solid #cbd5e1",
-                borderRadius: "0.375rem",
-                fontSize: "0.875rem",
-              }}
-            />
+            
+            <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
+              <input
+                type={showPassword ? "text" : "password"}
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+                style={{
+                  width: "100%",
+                  padding: "0.625rem",
+                  paddingRight: "3.5rem",
+                  border: "1px solid #cbd5e1",
+                  borderRadius: "0.375rem",
+                  fontSize: "0.875rem",
+                  boxSizing: "border-box",
+                }}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                style={{
+                  position: "absolute",
+                  right: "0.625rem",
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                  color: "#64748b",
+                  fontSize: "0.75rem",
+                  fontWeight: "600",
+                  padding: "0.25rem",
+                }}
+              >
+                {showPassword ? "Ocultar" : "Ver"}
+              </button>
+            </div>
           </div>
 
           <button
