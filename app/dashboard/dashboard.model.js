@@ -29,5 +29,5 @@ export async function searchCustomersApi(query) {
   }
   
   const result = await res.json();
-  return result.customers;
-}   
+  return result.data || [];
+}

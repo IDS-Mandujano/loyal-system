@@ -22,7 +22,7 @@ export default function CustomerSearch({
         </button>
       </form>
 
-      {searchResults.length > 0 && (
+      {searchResults?.length > 0 && (
         <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
           {searchResults.map((c) => (
             <li 
@@ -31,7 +31,7 @@ export default function CustomerSearch({
               style={{ padding: '0.75rem', borderBottom: '1px solid #f1f5f9', cursor: 'pointer', display: 'flex', justifyContent: 'space-between' }}
             >
               <span><strong>{c.name}</strong> ({c.email})</span>
-              <span>Nivel: <strong>{c.level}</strong> | Puntos: <strong>{c.points}</strong></span>
+              <span>Nivel: <strong>{c.tier}</strong> | Puntos: <strong>{c.points}</strong></span>
             </li>
           ))}
         </ul>
