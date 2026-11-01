@@ -13,7 +13,7 @@ export async function executeManualSync() {
     const res = await fetch('api/sync', { method : 'POST' });
     const result = await res.json();
 
-    if (!result.ok || !result.success){
+    if (!res.ok || !result.success){
         throw Error(result.error || 'Error al sincronizar');
     }
 
