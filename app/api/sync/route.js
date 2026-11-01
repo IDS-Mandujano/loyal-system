@@ -1,8 +1,8 @@
     import { NextResponse } from "next/server";
     import db from "@/lib/db";
     import { getExternalData } from "@/lib/fakeapi";
-    import { queries } from "@/lib/queries"
-    import { hasPermission } from "@/lib/auth";
+    import { queries } from "@/lib/services/syncService"
+    import { hasPermission } from "@/lib/services/authService";
 
 
     const CUTOFF_DATE = new Date('2026-04-30T23:59:59');

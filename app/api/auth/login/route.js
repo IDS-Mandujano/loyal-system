@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { authenticateInternalUser } from "@/lib/auth";
+import { authenticateInternalUser } from "@/lib/services/authService";
 
 export async function POST(request) {
     try {
@@ -17,6 +17,7 @@ export async function POST(request) {
 
         const response = NextResponse.json({
             success: true,
+            message : 'Inicio de sesión exitoso.',
             user: {
                 id: user.id,
                 name: user.name,
@@ -29,11 +30,16 @@ export async function POST(request) {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
             sameSite: "strict",
+            maxAge : 60 * 60 * 24 * 7,
             path: "/"
         });
 
-        return response;
+        return response
+
     } catch (error) {
+        if (error.message === 'Usuario desactivado') {
+            return NextResponse.json({ success: false, error: 'El usuario está desactivado.' }, { status: 403 });
+        }
         return NextResponse.json({ success: false, error: error.message }, { status: 500 });
     }
 }
