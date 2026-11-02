@@ -11,6 +11,10 @@ export async function POST(request) {
 
         const user = await authenticateInternalUser(email, password);
 
+        if (user?.error) {
+            return NextResponse.json({ success: false, error: user.error }, { status: 423 });
+        }
+
         if (!user) {
             return NextResponse.json({ success: false, error: "Credenciales inválidas" }, { status: 401 });
         }

@@ -15,6 +15,10 @@ export async function POST(request) {
 
     const client = await authenticateClient(email, password);
 
+    if (client?.error === 'Cuenta bloqueada temporalmente por demasiados intentos fallidos.' || client?.error?.startsWith('Demasiados intentos')) {
+      return NextResponse.json({ success: false, error: client.error }, { status: 423 });
+    }
+
     if (!client) {
       return NextResponse.json(
         { success: false, error: 'Credenciales inválidas' },
