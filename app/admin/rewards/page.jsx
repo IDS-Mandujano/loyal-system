@@ -1,36 +1,48 @@
 'use client';
 
-import { useRewards } from './useRewards';
-import { RewardForm } from './components/RewardForm';
-import { RewardsTable } from './components/RewardsTable';
+import { use, Suspense } from 'react';
+import { useCustomerDetail } from './useCustomerDetail';
+import { CustomerInfoCard } from './components/CustomerInfoCard';
+import { MovementsTable } from './components/MovementsTable';
 
-export default function AdminRewardsPage() {
+export const dynamic = 'force-dynamic';
+
+function CustomerDetailContent({ customerId }) {
   const {
-    rewards,
+    customer,
     loading,
-    form,
+    tempPassword,
     message,
-    handleInputChange,
-    handleFileChange,
-    createReward
-  } = useRewards();
+    handleGenerateAccess
+  } = useCustomerDetail(customerId);
+
+  if (loading) return <div style={{ padding: '30px' }}>Cargando ficha del cliente...</div>;
+  if (!customer) return <div style={{ padding: '30px' }}>Cliente no encontrado o sin autorización.</div>;
 
   return (
     <div style={{ padding: '30px', fontFamily: 'system-ui, sans-serif', maxWidth: '1000px', margin: '0 auto' }}>
-      <h1>Gestión de Recompensas y Catálogo</h1>
-      <p>Administra los productos o descuentos canjeables y sube sus imágenes a Supabase Storage.</p>
+      <a href="/dashboard" style={{ color: '#0070f3', textDecoration: 'none', display: 'inline-block', marginBottom: '20px' }}>
+        ← Volver al Dashboard
+      </a>
 
-      {message && <div style={{ padding: '10px', background: '#e2f0d9', marginBottom: '20px', borderRadius: '5px' }}>{message}</div>}
-
-      <RewardForm 
-        form={form} 
-        onInputChange={handleInputChange} 
-        onFileChange={handleFileChange} 
-        onSubmit={createReward} 
+      <CustomerInfoCard 
+        customer={customer} 
+        onGenerateAccess={handleGenerateAccess} 
+        tempPassword={tempPassword} 
+        message={message} 
       />
 
-      <h2>Catálogo Actual</h2>
-      <RewardsTable rewards={rewards} loading={loading} />
+      <MovementsTable movimientos={customer.movimientos} />
     </div>
+  );
+}
+
+export default function CustomerDetailPage({ params }) {
+  const unwrappedParams = use(Promise.resolve(params));
+  
+  return (
+    <Suspense fallback={<div style={{ padding: '30px' }}>Cargando componentes...</div>}>
+      <CustomerDetailContent customerId={unwrappedParams.id} />
+    </Suspense>
   );
 }

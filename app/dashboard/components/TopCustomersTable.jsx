@@ -1,3 +1,5 @@
+import Link from 'next/link';
+
 export default function TopCustomersTable({ top10 }) {
   return (
     <div style={{ backgroundColor: 'white', padding: '1.5rem', borderRadius: '0.5rem', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
@@ -14,8 +16,22 @@ export default function TopCustomersTable({ top10 }) {
         <tbody>
           {top10?.map((c, index) => (
             <tr key={c.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
-              <td style={{ padding: '0.5rem' }}>{index + 1}</td>
-              <td style={{ padding: '0.5rem' }}>{c.name}</td>
+              <td style={{ padding: '0.5rem' }}>
+                <Link 
+                  href={`/admin/customer/${c.id}`}
+                  style={{ color: '#0070f3', textDecoration: 'none', fontWeight: '500' }}
+                >
+                  #{index + 1}
+                </Link>
+              </td>
+              <td style={{ padding: '0.5rem' }}>
+                <Link 
+                  href={`/admin/customer/${c.id}`}
+                  style={{ color: '#0070f3', textDecoration: 'none', fontWeight: '500' }}
+                >
+                  {c.name}
+                </Link>
+              </td>
               <td style={{ padding: '0.5rem' }}>{c.tier}</td>
               <td style={{ padding: '0.5rem', textAlign: 'right', fontWeight: 'bold' }}>{c.points}</td>
             </tr>
