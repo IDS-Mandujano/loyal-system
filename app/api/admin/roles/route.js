@@ -19,7 +19,17 @@ export async function GET() {
     db.query('SELECT id, name FROM roles ORDER BY id'),
     db.query('SELECT id, code, description FROM permissions ORDER BY id')
   ]);
-  return NextResponse.json({ roles: roles.rows, permissions: permissions.rows });
+  const assignments = await db.query(`
+    SELECT rp.role_id, p.id, p.code, p.description
+    FROM role_permissions rp
+    JOIN permissions p ON p.id = rp.permission_id
+    ORDER BY rp.role_id, p.id
+  `);
+  const rolesWithPermissions = roles.rows.map(role => ({
+    ...role,
+    permissions: assignments.rows.filter(permission => permission.role_id === role.id)
+  }));
+  return NextResponse.json({ roles: rolesWithPermissions, permissions: permissions.rows });
 }
 
 export async function POST(request) {

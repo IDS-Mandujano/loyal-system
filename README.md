@@ -34,6 +34,7 @@ Las variables se consumen únicamente en el servidor. Nunca publiques `.env.loca
 - Personal interno: `/auth/login` y `/dashboard`.
 - Recompensas: `/admin/rewards`.
 - Portal de clientes: `/client/login` y `/client`.
+- Administración de tokens API: `/admin/tokens`; el token plano solo se muestra al generarlo.
 - Endpoints de validación: `/api/fidelizacion/*`, con `Authorization: Bearer <token>`.
 - Cron diario: `/api/sync/cron`, protegido con `CRON_SECRET`.
 
@@ -49,6 +50,9 @@ desde el navegador para cambiar contraseña o canjear.
 - Los canjes bloquean cliente y recompensa dentro de una transacción para evitar
   saldo negativo y sobreventa de stock.
 - Las imágenes se guardan en Supabase Storage; la base solo conserva la URL.
+- El logout elimina las cookies de sesión interna y de cliente desde `/api/auth/logout`.
+- Cinco intentos fallidos consecutivos bloquean temporalmente el acceso durante 15 minutos.
+  La tabla `login_attempts` se crea de forma idempotente al primer intento.
 
 ## Modelo de datos
 

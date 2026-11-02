@@ -7,7 +7,7 @@ export default function CustomerSearch({
   setSelectedCustomer
 }) {
   return (
-    <div style={{ backgroundColor: 'white', padding: '1.5rem', borderRadius: '0.5rem', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', marginBottom: '2rem' }}>
+    <div style={{ backgroundColor: 'white', padding: '1.5rem', borderRadius: '1rem', border: '1px solid #e2e8f0', boxShadow: '0 8px 24px rgba(15, 23, 42, 0.06)', marginBottom: '2rem' }}>
       <h2 style={{ fontSize: '1.25rem', fontWeight: '600', marginBottom: '1rem', color: '#334155' }}>Búsqueda de Clientes</h2>
       <form onSubmit={handleSearch} style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
         <input
@@ -15,9 +15,9 @@ export default function CustomerSearch({
           placeholder="Buscar por nombre o correo..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          style={{ flex: 1, padding: '0.5rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem' }}
+          style={{ flex: 1, padding: '0.75rem 0.9rem', border: '1px solid #cbd5e1', borderRadius: '0.6rem', fontSize: 15 }}
         />
-        <button type="submit" style={{ padding: '0.5rem 1rem', backgroundColor: '#0f172a', color: 'white', border: 'none', borderRadius: '0.375rem', cursor: 'pointer' }}>
+        <button type="submit" style={{ padding: '0.75rem 1.1rem', backgroundColor: '#2563eb', color: 'white', border: 'none', borderRadius: '0.6rem', cursor: 'pointer', fontWeight: 700 }}>
           Buscar
         </button>
       </form>
@@ -38,7 +38,7 @@ export default function CustomerSearch({
       )}
 
       {selectedCustomer && (
-        <div style={{ marginTop: '1rem', padding: '1rem', backgroundColor: '#f1f5f9', borderRadius: '0.375rem' }}>
+        <div style={{ marginTop: '1rem', padding: '1rem', backgroundColor: '#eff6ff', border: '1px solid #dbeafe', borderRadius: '0.75rem' }}>
           <h3 style={{ margin: '0 0 0.5rem 0' }}>Detalle de {selectedCustomer.name}</h3>
           <p style={{ margin: '0.25rem 0' }}>Email: {selectedCustomer.email}</p>
           <p style={{ margin: '0.25rem 0' }}>Nivel Actual: <strong>{selectedCustomer.tier || 'Bronce'}</strong></p>
