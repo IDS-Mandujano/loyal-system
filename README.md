@@ -22,7 +22,6 @@ Ejecuta `pnpm exec node scripts/seed-admin.js` después de crear el rol administ
 DATABASE_URL=
 FAKE_API_KEY=
 NEXT_PUBLIC_SUPABASE_URL=
-NEXT_PUBLIC_SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_ROLE_KEY=
 JWT_SECRET=
 CRON_SECRET=
