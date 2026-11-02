@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { runFullSync } from '../syncService';
+import { runFullSync } from '../syncLogic';
 
 export async function GET(request) {
   try {
