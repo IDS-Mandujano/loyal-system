@@ -1,14 +1,16 @@
 import { NextResponse } from 'next/server';
 import { updateClientPassword } from '@/lib/services/clientAuthService';
+import { getAuthenticatedClientId } from '@/lib/services/clientSession';
 
 export async function POST(request) {
   try {
-    const { clientId, newPassword } = await request.json();
+    const clientId = await getAuthenticatedClientId(request);
+    const { newPassword } = await request.json();
 
     if (!clientId || !newPassword) {
       return NextResponse.json(
-        { success: false, error: 'Datos incompletos' },
-        { status: 400 }
+        { success: false, error: clientId ? 'Nueva contraseña requerida' : 'Sesión de cliente requerida' },
+        { status: clientId ? 400 : 401 }
       );
     }
 

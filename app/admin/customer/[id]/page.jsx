@@ -5,6 +5,7 @@ import { use } from 'react';
 import { useCustomerDetail } from './useCustomerDetail';
 import { CustomerInfoCard } from './components/CustomerInfoCard';
 import { MovementsTable } from './components/MovementsTable';
+import AdminNav from '../../components/AdminNav';
 
 function CustomerDetailContent({ customerId }) {
   const {
@@ -20,6 +21,7 @@ function CustomerDetailContent({ customerId }) {
 
   return (
     <div style={{ padding: '30px', fontFamily: 'system-ui, sans-serif', maxWidth: '1000px', margin: '0 auto' }}>
+      <AdminNav active="/dashboard" />
       <a href="/dashboard" style={{ color: '#0070f3', textDecoration: 'none', display: 'inline-block', marginBottom: '20px' }}>
         ← Volver al Dashboard
       </a>

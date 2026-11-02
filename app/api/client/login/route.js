@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { authenticateClient } from '@/lib/services/clientAuthService';
+import { createClientToken } from '@/lib/services/clientSession';
 
 export async function POST(request) {
   try {
@@ -28,7 +29,7 @@ export async function POST(request) {
       );
     }
 
-    return NextResponse.json(
+    const response = NextResponse.json(
       {
         success: true,
         user: {
@@ -42,6 +43,14 @@ export async function POST(request) {
       },
       { status: 200 }
     );
+    response.cookies.set('client_token', createClientToken(client.id), {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 60 * 60 * 8,
+      path: '/'
+    });
+    return response;
   } catch (error) {
     console.error('Error en /api/client/login:', error);
     return NextResponse.json(

@@ -1,8 +1,23 @@
 import { NextResponse } from 'next/server';
 import { getAllRewards, createReward } from '@/lib/services/rewardService';
+import { cookies } from 'next/headers';
+import { hasPermission } from '@/lib/services/authService';
+
+async function requireRewardPermission() {
+  const sessionCookie = (await cookies()).get('user_session')?.value;
+  if (!sessionCookie) return { error: NextResponse.json({ success: false, error: 'No autorizado' }, { status: 401 }) };
+  let session;
+  try { session = JSON.parse(sessionCookie); } catch { return { error: NextResponse.json({ success: false, error: 'Sesión inválida' }, { status: 401 }) }; }
+  if (!(await hasPermission(session.id, 'manage_rewards')) && !(await hasPermission(session.id, 'manage_users'))) {
+    return { error: NextResponse.json({ success: false, error: 'Acceso denegado' }, { status: 403 }) };
+  }
+  return {};
+}
 
 export async function GET(request) {
   try {
+    const auth = await requireRewardPermission();
+    if (auth.error) return auth.error;
     const { searchParams } = new URL(request.url);
     const includeInactive = searchParams.get('includeInactive') === 'true';
     
@@ -16,6 +31,8 @@ export async function GET(request) {
 
 export async function POST(request) {
   try {
+    const auth = await requireRewardPermission();
+    if (auth.error) return auth.error;
     const formData = await request.formData();
     const data = {
       type: formData.get('type'),

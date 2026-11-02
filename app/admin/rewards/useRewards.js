@@ -33,7 +33,8 @@ export function useRewards() {
   };
 
   useEffect(() => {
-    fetchRewards();
+    const timer = setTimeout(fetchRewards, 0);
+    return () => clearTimeout(timer);
   }, []);
 
   const handleInputChange = (field, value) => {

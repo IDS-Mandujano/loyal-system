@@ -14,26 +14,20 @@ export function handleCors() {
 }
 
 export async function validateBearerToken(request) {
-  try {
-    const cookieStore = await cookies();
-    const sessionCookie = cookieStore.get('user_session');
-    
-    if (sessionCookie && sessionCookie.value) {
-      const sessionData = JSON.parse(sessionCookie.value);
-      if (sessionData && sessionData.id) {
-        return true;
-      }
-    }
-  } catch (cookieError) {
-    console.error('[Auth] Error leyendo cookie de sesión:', cookieError);
-    return false;
-  }
-
   const authHeader = request.headers.get('authorization');
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return false;
+  if (authHeader?.startsWith('Bearer ')) {
+    const token = authHeader.slice(7).trim();
+    return token ? verifyExternalApiToken(token) : false;
   }
 
-  const token = authHeader.split(' ')[1];
-  return await verifyExternalApiToken(token);
+  // Internal users can use the customer detail screen; external consumers
+  // must still provide the generated API token.
+  const session = (await cookies()).get('user_session')?.value;
+  if (!session) return false;
+  try {
+    const data = JSON.parse(session);
+    return Boolean(data.id);
+  } catch {
+    return false;
+  }
 }

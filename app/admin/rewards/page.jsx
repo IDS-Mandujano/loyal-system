@@ -3,6 +3,7 @@
 import { useRewards } from './useRewards';
 import { RewardForm } from './components/RewardForm';
 import { RewardsTable } from './components/RewardsTable';
+import AdminNav from '../components/AdminNav';
 
 export default function AdminRewardsPage() {
   const {
@@ -17,6 +18,7 @@ export default function AdminRewardsPage() {
 
   return (
     <div style={{ padding: '30px', fontFamily: 'system-ui, sans-serif', maxWidth: '1000px', margin: '0 auto' }}>
+      <AdminNav active="/admin/rewards" />
       <h1>Gestión de Recompensas y Catálogo</h1>
       <p>Administra los productos o descuentos canjeables y sube sus imágenes a Supabase Storage.</p>
 
