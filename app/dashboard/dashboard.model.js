@@ -1,7 +1,7 @@
 export async function fetchDashboardMetrics() {
   const res = await fetch('/api/dashboard');
   if (res.status === 401) {
-    window.location.href = '/login';
+    window.location.href = '/auth/login';
     return;
   }
   const result = await res.json();
