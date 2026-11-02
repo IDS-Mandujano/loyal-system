@@ -23,11 +23,12 @@ export default function DashboardPage() {
     handleSearch
   } = useDashboard();
 
-  if (loading) return <div style={{ padding: '2rem', fontFamily: 'sans-serif' }}>Cargando Panel...</div>;
+  if (loading) return <div style={{ minHeight: '100vh', display: 'grid', placeItems: 'center', fontFamily: 'system-ui, sans-serif', color: '#64748b', background: '#f8fafc' }}>Cargando panel...</div>;
 
   return (
-    <div style={{ padding: '2rem', fontFamily: 'sans-serif', backgroundColor: '#f8fafc', minHeight: '100vh' }}>
-      <AdminNav active="/dashboard" />
+    <div style={{ padding: '2rem 1.25rem 4rem', fontFamily: 'system-ui, sans-serif', background: 'linear-gradient(135deg, #eff6ff 0%, #f8fafc 55%, #ecfeff 100%)', minHeight: '100vh' }}>
+      <div style={{ maxWidth: 1180, margin: '0 auto' }}>
+        <AdminNav active="/dashboard" />
       <HeaderSync 
         onSync={handleSync} 
         syncing={syncing} 
@@ -49,7 +50,7 @@ export default function DashboardPage() {
         <TopCustomersTable top10={data?.top10} />
         <CustomerAlerts inRisk={data?.inRisk} birthdays={data?.birthdays} />
       </div>
-
+      </div>
     </div>
   );
 }

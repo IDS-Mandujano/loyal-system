@@ -100,6 +100,7 @@ const handleFileChange = (file) => {
     message,
     handleInputChange,
     handleFileChange,
-    createReward
+    createReward,
+    imageFile
   };
 }
