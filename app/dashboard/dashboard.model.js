@@ -10,7 +10,7 @@ export async function fetchDashboardMetrics() {
 }
 
 export async function executeManualSync() {
-    const res = await fetch('api/sync', { method : 'POST' });
+    const res = await fetch('/api/sync', { method : 'POST' });
     const result = await res.json();
 
     if (!res.ok || !result.success){

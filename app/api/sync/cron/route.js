@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { runFullSync } from '../syncService';
 
 export async function GET(request) {
   try {
@@ -12,7 +13,7 @@ export async function GET(request) {
       );
     }
 
-    const syncResult = { status: 'Sincronización completada exitosamente' };
+    const syncResult = await runFullSync();
 
     return NextResponse.json({
       success: true,
