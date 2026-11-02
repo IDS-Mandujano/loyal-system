@@ -8,15 +8,18 @@ export default function ManagementPage() {
   const [roles, setRoles] = useState([]);
   const [permissions, setPermissions] = useState([]);
   const [redemptions, setRedemptions] = useState([]);
+  const [currentUser, setCurrentUser] = useState(null);
+  const [selectedPermissionsUser, setSelectedPermissionsUser] = useState(null);
   const [message, setMessage] = useState('');
   const [newUser, setNewUser] = useState({ name: '', email: '', password: '', role_id: '' });
   const [newRole, setNewRole] = useState({ name: '', permission_ids: [] });
 
   async function load() {
-    const [usersResponse, rolesResponse, redemptionsResponse] = await Promise.all([
+    const [usersResponse, rolesResponse, redemptionsResponse, meResponse] = await Promise.all([
       fetch('/api/admin/users'),
       fetch('/api/admin/roles'),
-      fetch('/api/admin/redemptions')
+      fetch('/api/admin/redemptions'),
+      fetch('/api/auth/me')
     ]);
     if (usersResponse.ok) setUsers((await usersResponse.json()).users);
     if (rolesResponse.ok) {
@@ -25,6 +28,7 @@ export default function ManagementPage() {
       setPermissions(data.permissions);
     }
     if (redemptionsResponse.ok) setRedemptions((await redemptionsResponse.json()).redemptions);
+    if (meResponse.ok) setCurrentUser((await meResponse.json()).user);
   }
 
   useEffect(() => {
@@ -81,6 +85,13 @@ export default function ManagementPage() {
         <h1 style={{ color: '#0f172a', margin: '0.35rem 0', fontSize: 32 }}>Centro de administración</h1>
         <p style={{ color: '#64748b', margin: 0, maxWidth: 680 }}>Gestiona el equipo interno, define permisos y supervisa el ciclo de vida de los canjes.</p>
       </header>
+      {currentUser && <section style={{ ...cardStyle, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 16, flexWrap: 'wrap', background: '#0f172a', color: '#fff' }}>
+        <span style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <span style={{ ...avatarStyle, background: '#2563eb', color: '#fff' }}>{currentUser.name.charAt(0).toUpperCase()}</span>
+          <span><small style={{ display: 'block', color: '#93c5fd', fontWeight: 700 }}>SESIÓN ACTIVA</small><strong style={{ display: 'block', fontSize: 17 }}>{currentUser.name}</strong><small style={{ color: '#cbd5e1' }}>{currentUser.email} · {currentUser.role_name}</small></span>
+        </span>
+        <span style={{ color: '#86efac', fontSize: 13, fontWeight: 700 }}>● Cuenta activa · {currentUser.permissions.length} permisos</span>
+      </section>}
       {message && <div style={{ padding: '0.85rem 1rem', marginBottom: '1.5rem', color: '#166534', backgroundColor: '#dcfce7', border: '1px solid #86efac', borderRadius: 12, fontWeight: 600 }}>{message}</div>}
       <section style={cardStyle}>
         <SectionHeading eyebrow="Equipo" title="Usuarios internos" description="Crea cuentas y controla quién puede acceder al panel." />
@@ -100,9 +111,11 @@ export default function ManagementPage() {
           </span>
           <span style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <span style={{ color: user.is_active ? '#15803d' : '#64748b', fontSize: 13, fontWeight: 700 }}>{user.is_active ? '● Activo' : '○ Inactivo'}</span>
+            <button onClick={() => setSelectedPermissionsUser(user)} style={secondaryButton}>Ver capacidades</button>
             <button onClick={() => toggleUser(user)} style={secondaryButton}>{user.is_active ? 'Desactivar' : 'Activar'}</button>
           </span>
         </li>)}</ul>
+        {selectedPermissionsUser && <PermissionSummary user={selectedPermissionsUser} roles={roles} onClose={() => setSelectedPermissionsUser(null)} />}
       </section>
       <section style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.5rem', marginBottom: '1.5rem' }}>
       <div style={cardStyle}>
@@ -112,7 +125,7 @@ export default function ManagementPage() {
           <div style={{ display: 'grid', gap: 8, padding: '0.75rem', background: '#f8fafc', borderRadius: 10 }}>{permissions.map(permission => <label key={permission.id} style={{ display: 'flex', gap: 8, alignItems: 'center', color: '#475569', fontSize: 14 }}><input type="checkbox" checked={newRole.permission_ids.includes(permission.id)} onChange={e => setNewRole({ ...newRole, permission_ids: e.target.checked ? [...newRole.permission_ids, permission.id] : newRole.permission_ids.filter(id => id !== permission.id) })} /> {permission.description || permission.code}</label>)}</div>
           <button style={primaryButton}>+ Crear rol</button>
         </form>
-        <ul style={{ paddingLeft: 20, color: '#475569' }}>{roles.map(role => <li key={role.id} style={{ marginBottom: 5 }}>{role.name}</li>)}</ul>
+        <div style={{ display: 'grid', gap: 10, marginTop: 16 }}>{roles.map(role => <article key={role.id} style={{ padding: '0.85rem', border: '1px solid #e2e8f0', borderRadius: 10, background: '#f8fafc' }}><strong>{role.name}</strong><div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 8 }}>{role.permissions?.length ? role.permissions.map(permission => <span key={permission.code} style={permissionChip}>{permission.description || permission.code}</span>) : <small style={{ color: '#94a3b8' }}>Sin permisos asignados</small>}</div></article>)}</div>
       </div>
       <div style={{ ...cardStyle, background: '#0f172a', color: '#fff' }}>
         <p style={{ margin: 0, color: '#93c5fd', fontWeight: 700, fontSize: 13, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Accesos rápidos</p>
@@ -142,6 +155,17 @@ const successButton = { ...secondaryButton, color: '#15803d', borderColor: '#bbf
 const dangerButton = { ...secondaryButton, color: '#b91c1c', borderColor: '#fecaca', background: '#fff1f2' };
 const listItemStyle = { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap', padding: '0.9rem', backgroundColor: '#f8fafc', border: '1px solid #f1f5f9', borderRadius: 11 };
 const avatarStyle = { width: 36, height: 36, display: 'grid', placeItems: 'center', borderRadius: '50%', background: '#dbeafe', color: '#1d4ed8', fontWeight: 800 };
+const permissionChip = { padding: '0.3rem 0.5rem', borderRadius: 99, background: '#dbeafe', color: '#1d4ed8', fontSize: 11, fontWeight: 700 };
 function SectionHeading({ eyebrow, title, description }) {
   return <div style={{ marginBottom: '1rem' }}><p style={{ margin: 0, color: '#2563eb', fontWeight: 700, fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.08em' }}>{eyebrow}</p><h2 style={{ margin: '0.3rem 0', fontSize: 22 }}>{title}</h2><p style={{ margin: 0, color: '#64748b', fontSize: 14 }}>{description}</p></div>;
+}
+
+function PermissionSummary({ user, roles, onClose }) {
+  const role = roles.find(item => item.id === user.role_id);
+  return <div style={{ marginTop: 14, padding: '1rem', borderRadius: 12, background: '#eff6ff', border: '1px solid #bfdbfe' }}>
+    <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12 }}><strong>Capacidades de {user.name}</strong><button type="button" onClick={onClose} style={{ border: 0, background: 'transparent', color: '#1d4ed8', cursor: 'pointer', fontWeight: 700 }}>Cerrar</button></div>
+    <p style={{ margin: '0.4rem 0', color: '#475569', fontSize: 14 }}>Rol asignado: <strong>{user.role_name}</strong>. Estas son sus acciones permitidas:</p>
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>{role?.permissions?.map(permission => <span key={permission.code} style={permissionChip}>✓ {permission.description || permission.code}</span>) || <span style={{ color: '#64748b' }}>No hay permisos asignados.</span>}</div>
+    <p style={{ margin: '0.75rem 0 0', color: '#64748b', fontSize: 12 }}>Cualquier endpoint sin uno de estos permisos debe responder 403; ocultar botones no sustituye la validación del backend.</p>
+  </div>;
 }
