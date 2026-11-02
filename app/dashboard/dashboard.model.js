@@ -1,7 +1,7 @@
 export async function fetchDashboardMetrics() {
   const res = await fetch('/api/dashboard');
   if (res.status === 401) {
-    window.location.href = '/login';
+    window.location.href = '/auth/login';
     return;
   }
   const result = await res.json();
@@ -10,7 +10,7 @@ export async function fetchDashboardMetrics() {
 }
 
 export async function executeManualSync() {
-    const res = await fetch('api/sync', { method : 'POST' });
+    const res = await fetch('/api/sync', { method : 'POST' });
     const result = await res.json();
 
     if (!res.ok || !result.success){

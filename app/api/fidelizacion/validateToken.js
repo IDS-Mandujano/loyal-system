@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import db from '@/lib/db';
-import crypto from 'crypto';
+import { cookies } from 'next/headers';
+import { verifyExternalApiToken } from '@/lib/services/authService';
 
 export function handleCors() {
   return new NextResponse(null, {
@@ -14,37 +14,26 @@ export function handleCors() {
 }
 
 export async function validateBearerToken(request) {
+  try {
+    const cookieStore = await cookies();
+    const sessionCookie = cookieStore.get('user_session');
+    
+    if (sessionCookie && sessionCookie.value) {
+      const sessionData = JSON.parse(sessionCookie.value);
+      if (sessionData && sessionData.id) {
+        return true;
+      }
+    }
+  } catch (cookieError) {
+    console.error('[Auth] Error leyendo cookie de sesión:', cookieError);
+    return false;
+  }
+
   const authHeader = request.headers.get('authorization');
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    console.log('[Auth] Header faltante o sin formato Bearer');
     return false;
   }
 
   const token = authHeader.split(' ')[1];
-  const tokenHash = crypto.createHash('sha256').update(token).digest('hex');
-  
-  console.log('[Auth] Token recibido en plano:', token);
-  console.log('[Auth] Hash calculado:', tokenHash);
-
-  const client = await db.getClient();
-  try {
-    const result = await client.query(
-      `SELECT * FROM api_tokens WHERE token_hash = $1 AND is_active = TRUE`,
-      [tokenHash]
-    );
-
-    console.log('[Auth] Registros coincidentes en BD:', result.rows.length);
-    if (result.rows.length === 0) {
-
-      const allTokens = await client.query(`SELECT id, name, token_hash, is_active FROM api_tokens`);
-      console.log('[Auth] Tokens actuales en la BD:', allTokens.rows);
-    }
-
-    return result.rows.length > 0;
-  } catch (e) {
-    console.error('[Auth] Error en consulta SQL:', e);
-    return false;
-  } finally {
-    client.release();
-  }
+  return await verifyExternalApiToken(token);
 }

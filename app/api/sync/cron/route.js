@@ -1,11 +1,11 @@
 import { NextResponse } from 'next/server';
+import { runFullSync } from '../syncService';
 
 export async function GET(request) {
   try {
     const authHeader = request.headers.get('authorization');
     const expectedToken = `Bearer ${process.env.CRON_SECRET}`;
 
-    // Validar que la petición provenga de Vercel Cron con el token secreto correcto
     if (!process.env.CRON_SECRET || authHeader !== expectedToken) {
       return NextResponse.json(
         { success: false, error: 'Unauthorized' },
@@ -13,9 +13,7 @@ export async function GET(request) {
       );
     }
 
-    // Aquí puedes colocar la lógica de sincronización de tu base de datos o llamada a servicio
-    // Ejemplo: const syncResult = await runFullSync();
-    const syncResult = { status: 'Sincronización completada exitosamente' };
+    const syncResult = await runFullSync();
 
     return NextResponse.json({
       success: true,

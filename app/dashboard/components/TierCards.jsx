@@ -1,6 +1,4 @@
 export default function TierCards({ tiers }) {
-  console.log("Datos de tiers recibidos:", tiers);
-
   return (
     <>
       <h2 style={{ fontSize: '1.25rem', fontWeight: '600', marginBottom: '1rem', color: '#334155' }}>
