@@ -1,7 +1,7 @@
 export async function fetchDashboardMetrics() {
   const res = await fetch('/api/dashboard');
   if (res.status === 401) {
-    window.location.href = '/login';
+    window.location.href = '/auth/login';
     return;
   }
   const result = await res.json();
@@ -10,10 +10,10 @@ export async function fetchDashboardMetrics() {
 }
 
 export async function executeManualSync() {
-    const res = await fetch('api/sync', { method : 'POST' });
+    const res = await fetch('/api/sync/manual', { method : 'POST' });
     const result = await res.json();
 
-    if (!result.ok || !result.success){
+    if (!res.ok || !result.success){
         throw Error(result.error || 'Error al sincronizar');
     }
 
@@ -22,7 +22,10 @@ export async function executeManualSync() {
 
 export async function searchCustomersApi(query) {
   if (!query.trim()) return [];
-  const res = await fetch(`/api/customers/search?q=${encodeURIComponent(query)}`);
+  const res = await fetch(`/api/customers/search?q=${encodeURIComponent(query)}`, {
+    method : 'GET',
+    credentials : 'include'
+  });
   
   if (!res.ok) {
     throw new Error(`Error en el servidor (${res.status})`);
