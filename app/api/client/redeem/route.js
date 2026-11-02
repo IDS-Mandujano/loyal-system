@@ -1,14 +1,16 @@
 import { NextResponse } from 'next/server';
 import { redeemReward } from '@/lib/services/redemptionService';
+import { getAuthenticatedClientId } from '@/lib/services/clientSession';
 
 export async function POST(request) {
   try {
-    const { clientId, rewardId } = await request.json();
+    const clientId = await getAuthenticatedClientId(request);
+    const { rewardId } = await request.json();
 
     if (!clientId || !rewardId) {
       return NextResponse.json(
-        { success: false, error: 'clientId y rewardId son requeridos' },
-        { status: 400 }
+        { success: false, error: clientId ? 'rewardId es requerido' : 'Sesión de cliente requerida' },
+        { status: clientId ? 400 : 401 }
       );
     }
 

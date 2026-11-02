@@ -41,7 +41,7 @@ export default function CustomerSearch({
         <div style={{ marginTop: '1rem', padding: '1rem', backgroundColor: '#f1f5f9', borderRadius: '0.375rem' }}>
           <h3 style={{ margin: '0 0 0.5rem 0' }}>Detalle de {selectedCustomer.name}</h3>
           <p style={{ margin: '0.25rem 0' }}>Email: {selectedCustomer.email}</p>
-          <p style={{ margin: '0.25rem 0' }}>Nivel Actual: <strong>{selectedCustomer.level}</strong></p>
+          <p style={{ margin: '0.25rem 0' }}>Nivel Actual: <strong>{selectedCustomer.tier || 'Bronce'}</strong></p>
           <p style={{ margin: '0.25rem 0' }}>Puntos Acumulados: <strong>{selectedCustomer.points}</strong></p>
         </div>
       )}

@@ -6,6 +6,7 @@ import TierCards from './components/TierCards';
 import CustomerSearch from './components/CustomerSearch';
 import TopCustomersTable from './components/TopCustomersTable';
 import CustomerAlerts from './components/CustomerAlerts';
+import AdminNav from '../admin/components/AdminNav';
 
 export default function DashboardPage() {
   const {
@@ -26,7 +27,7 @@ export default function DashboardPage() {
 
   return (
     <div style={{ padding: '2rem', fontFamily: 'sans-serif', backgroundColor: '#f8fafc', minHeight: '100vh' }}>
-      
+      <AdminNav active="/dashboard" />
       <HeaderSync 
         onSync={handleSync} 
         syncing={syncing} 

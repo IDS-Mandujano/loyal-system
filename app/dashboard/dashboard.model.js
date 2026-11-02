@@ -22,7 +22,10 @@ export async function executeManualSync() {
 
 export async function searchCustomersApi(query) {
   if (!query.trim()) return [];
-  const res = await fetch(`/api/customers/search?q=${encodeURIComponent(query)}`);
+  const res = await fetch(`/api/customers/search?q=${encodeURIComponent(query)}`, {
+    method : 'GET',
+    credentials : 'include'
+  });
   
   if (!res.ok) {
     throw new Error(`Error en el servidor (${res.status})`);

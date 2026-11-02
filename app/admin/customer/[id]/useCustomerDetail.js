@@ -33,7 +33,8 @@ export function useCustomerDetail(customerId) {
   };
 
   useEffect(() => {
-    fetchCustomerDetail();
+    const timer = setTimeout(fetchCustomerDetail, 0);
+    return () => clearTimeout(timer);
   }, [customerId]);
 
   const handleGenerateAccess = async () => {
