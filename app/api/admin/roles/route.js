@@ -29,6 +29,14 @@ export async function POST(request) {
   const client = await db.getClient();
   try {
     await client.query('BEGIN');
+    await client.query(`
+      SELECT setval(
+        pg_get_serial_sequence('roles', 'id'),
+        COALESCE(MAX(id), 1),
+        COUNT(*) > 0
+      )
+      FROM roles
+    `);
     const role = await client.query('INSERT INTO roles (name) VALUES ($1) RETURNING id, name', [name.trim()]);
     for (const permissionId of permission_ids) {
       await client.query('INSERT INTO role_permissions (role_id, permission_id) VALUES ($1, $2)', [role.rows[0].id, permissionId]);
@@ -38,7 +46,9 @@ export async function POST(request) {
   } catch (error) {
     await client.query('ROLLBACK');
     console.error('Error creando rol:', error);
-    return NextResponse.json({ error: 'No se pudo crear el rol' }, { status: 400 });
+    return NextResponse.json({
+      error: error.code === '23505' ? 'Ya existe un rol con ese nombre' : 'No se pudo crear el rol'
+    }, { status: 400 });
   } finally {
     client.release();
   }
